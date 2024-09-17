@@ -12,14 +12,16 @@ import json
 import os
 import subprocess
 from common.module import Module
+from common.task import Task
 from config.log import logger
-class Httpx(Module):
-    def __init__(self, targets:list):
-        self.modules = "sitefind"
+class Httpx(Module, Task):
+    def __init__(self, targets: list, task_id: str):
+        self.module = "sitefind"
         self.source ="httpx"
         self.collection = "sitefind"
         self.targets = targets
         Module.__init__(self)
+        Task.__init__(self, task_id)
 
     def do_scan(self):
         cmd = [self.execute_path, "-l", self.targets_file, "-random-agent", "-j", "-o", self.result_file]
@@ -48,15 +50,17 @@ class Httpx(Module):
 
     def run(self):
         self.begin()
+        self.receive_task()
         self.save_targets()
         self.do_scan()
         self.deal_data()
         self.save_db()
         self.finish()
         self.delete_temp()
+        self.finnish_task(self.elapse, len(self.results))
 
-def run(targets:list):
-    httpx = Httpx(targets)
+def run(targets: list, task_id: str):
+    httpx = Httpx(targets, task_id)
     httpx.run()
 
 if __name__ == '__main__':

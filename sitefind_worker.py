@@ -20,7 +20,8 @@ class SitefindWorker(RabbitMQConsumer):
         task = json.loads(self.message)
         # 获取targets
         targets = task['targets']
-        httpx.run(targets)
+        task_id = task['task_id']
+        httpx.run(targets, task_id)
 
 if __name__ == '__main__':
     # 启动子域名扫描服务

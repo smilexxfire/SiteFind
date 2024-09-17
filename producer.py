@@ -9,6 +9,7 @@
 @Comment ： 
 '''
 import json
+import uuid
 
 from common.database.producer import RabbitMQProducer
 from modules.mysitefind import MySiteFind
@@ -36,9 +37,8 @@ def send_site_find_task_from_domain(domain):
     :param domain: 主域名
     :return:
     '''
-    mysitefind = MySiteFind()
-    targets = mysitefind.get_site_find_targets_from_domain_with_naabu(domain)
-    print(targets)
+    usitefind = MySiteFind()
+    targets = usitefind.get_site_find_targets_from_domain_with_naabu(domain)
     batch_size = 100
     # 使用循环和切片来分批处理列表
     for i in range(0, len(targets), batch_size):
@@ -46,10 +46,11 @@ def send_site_find_task_from_domain(domain):
         batch = targets[i:i + batch_size]
         task = {
             "module": "httpx",
-            "targets": batch
+            "targets": batch,
+            "task_id": str(uuid.uuid4()),
         }
         send_task(task)
 
 
 if __name__ == '__main__':
-    send_site_find_task_from_domain("tuchong.com")
+    send_site_find_task_from_domain("cee.edu.cn")
